@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 [Serializable]
 [AddComponentMenu("Combat/Health/Health System", 2)]
@@ -36,7 +34,7 @@ public class HealthSystem : MonoBehaviour
 
     void OnHealthUpdated()
     {
-        if (healthBar != null) healthBar.GetComponent<HealthBarController>().UpdateHealthBar();
+        if (healthBar != null) healthBar.GetComponent<HealthBarController>().UpdateBar();
 
         if (health <= 0)
         {

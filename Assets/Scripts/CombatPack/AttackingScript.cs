@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,11 +6,10 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Collider))]
 public class AttackingScript : MonoBehaviour
 {
-    public InputAction fireAction = new(binding: "*/{primaryAction}"); // fire for player
+    public InputAction fireAction = new(binding: "<Mouse>/leftButton"); // fire for player
     public Animator animator;
     public bool playsSound;
     new private Collider collider;
-
     public float damageFromHit
     {
         get =>
@@ -19,14 +17,15 @@ public class AttackingScript : MonoBehaviour
     }
     [SerializeField] private float minRandomDamageFromHit = 20.0f;
     [SerializeField] private float maxRandomDamageFromHit = 25.0f;
+    // [Header("Trail")]
+    // public bool hasTrail;
+    // public TrailRenderer trail;
 
     void Awake()
     {
         if (!transform.parent.transform.CompareTag("Player")) return;
-        fireAction.performed += _ => Fire();
+        fireAction.performed += _ => StartCoroutine(Fire());
         fireAction.Enable();
-
-
     }
 
     void Start() => collider = GetComponent<Collider>();
@@ -34,26 +33,25 @@ public class AttackingScript : MonoBehaviour
     public void DisableHitbox() => collider.enabled = false;
     public void PlaySound() => GetComponent<AudioSource>().Play();
 
-    public void Fire()
+    public IEnumerator Fire()
     {
         collider.enabled = true;
         if (animator != null)
         {
-            GetComponent<Animator>().SetTrigger("Fire");
-            StartCoroutine(WaitForAnimation());
+            animator.SetTrigger("Fire");
+            // if (hasTrail) trail.enabled = true;
+            yield return new WaitWhile(IsAttackingAnimation);
+            // if (hasTrail) trail.enabled = false;
         }
         collider.enabled = false;
-    }
-
-    IEnumerator WaitForAnimation()
-    {
-        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length + animator.GetCurrentAnimatorStateInfo(0).normalizedTime + 1);
     }
 
     void Reset()
     {
         minRandomDamageFromHit = 20.0f;
         maxRandomDamageFromHit = 25.0f;
-        fireAction = new(binding: "*/{primaryAction}");
+        fireAction = new(binding: "<Mouse>/leftButton");
     }
+
+    bool IsAttackingAnimation() => animator.GetCurrentAnimatorClipInfo(0)[0].clip.name.EndsWith("Attack");
 }

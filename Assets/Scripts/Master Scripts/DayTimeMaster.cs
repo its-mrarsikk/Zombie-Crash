@@ -1,12 +1,14 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class DayTimeMaster : MonoBehaviour
 {
     [SerializeField] private bool nightTime;
+    [SerializeField] private GameObject dirLight;
     private static DayTimeMaster dtm;
     private static Material skyboxMat;
+    private static Light dLight;
+
     public static bool isNightTimeNow
     {
         get => dtm.nightTime; private set
@@ -25,6 +27,8 @@ public class DayTimeMaster : MonoBehaviour
         skyboxMat.SetFloat("_Blend", 0);
         skyboxMat.SetFloat("_Rotation", 0);
 
+        dLight = dirLight.GetComponent<Light>();
+
         StartCoroutine(DayNightLoop());
     }
 
@@ -38,7 +42,8 @@ public class DayTimeMaster : MonoBehaviour
             {
                 skyboxMat.SetFloat("_Rotation", skyboxMat.GetFloat("_Rotation") + 3.6f);
                 skyboxMat.SetFloat("_Blend", skyboxMat.GetFloat("_Blend") + 0.011f);
-                RenderSettings.ambientIntensity = (float)(0.0102 * (100 - i));
+                // RenderSettings.ambientIntensity = (float)(0.0102 * (100 - i));
+                dLight.intensity -= 0.006f;
                 yield return new WaitForSeconds(0.002f);
             }
         }
@@ -49,7 +54,8 @@ public class DayTimeMaster : MonoBehaviour
             {
                 skyboxMat.SetFloat("_Rotation", skyboxMat.GetFloat("_Rotation") - 3.6f);
                 skyboxMat.SetFloat("_Blend", skyboxMat.GetFloat("_Blend") - 0.011f);
-                RenderSettings.ambientIntensity = (float)(0.0102 * (100 + i));
+                // RenderSettings.ambientIntensity = (float)(0.0102 * (100 + i));
+                dLight.intensity += 0.006f;
                 yield return new WaitForSeconds(0.002f);
             }
         }
@@ -65,6 +71,4 @@ public class DayTimeMaster : MonoBehaviour
             yield return dtm.StartCoroutine(ToggleDayTime());
         }
     }
-
-    static IEnumerator Wait(float s) { yield return new WaitForSeconds(s); }
 }

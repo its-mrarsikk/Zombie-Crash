@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -72,6 +71,7 @@ public class ChasePlayer : MonoBehaviour
     IEnumerator AttackLoop()
     {
         yield return new WaitForSeconds(1);
-        attackModel.GetComponent<AttackingScript>().Fire();
+        yield return StartCoroutine(attackModel.GetComponent<AttackingScript>().Fire());
+        yield return new WaitForSeconds(5);
     }
 }

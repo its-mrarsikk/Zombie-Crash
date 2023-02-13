@@ -1,32 +1,30 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(Canvas))]
 [AddComponentMenu("Combat/Health/Health Bar Controller")]
-public class HealthBarController : MonoBehaviour
+public class HealthBarController : BarController
 {
-    [Header("Graphics")]
-    public GameObject foregroundSprite;
-
-    [Header("Health System")]
+    //[Header("Resources")]
     public GameObject player;
-    public GameObject healthSystemOwner;
     private Camera cam;
-    private Canvas canvas;
     private bool isOnPlayer = false;
+    private HealthSystem healthsys;
 
     void Start()
     {
         cam = Camera.main;
         canvas = foregroundSprite.transform.parent.GetComponentInParent<Canvas>();
         if (transform.parent.name == "PlayerUI") isOnPlayer = true;
+        healthsys = resourceOwner.GetComponent<HealthSystem>();
     }
 
-    public void UpdateHealthBar()
+    public override void UpdateBar()
     {
-        HealthSystem healthsys = healthSystemOwner.GetComponent<HealthSystem>();
+        if (counter != null)
+            counter.GetComponent<TMP_Text>().text = $"{NormalizeFloat(healthsys.health)}/{NormalizeFloat(healthsys.maximumHealth)}";
+
         float fillamt = healthsys.health / healthsys.maximumHealth;
         foregroundSprite.GetComponent<Image>().fillAmount = fillamt;
     }
@@ -42,4 +40,5 @@ public class HealthBarController : MonoBehaviour
         }
         else canvas.enabled = true;
     }
+
 }
